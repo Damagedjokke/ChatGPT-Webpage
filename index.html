@@ -70,6 +70,7 @@
           <a href="#quests">Quests</a>
           <a href="#dice">Dice</a>
           <a href="#names">Name Forge</a>
+          <a href="#backstory">Backstory</a>
           <a href="#map">Map</a>
           <span class="switch" aria-label="Toggle day/night theme"><input id="themeToggle" type="checkbox" role="switch" aria-checked="false" aria-label="Toggle theme"><label for="themeToggle" class="visually-hidden">Theme</label></span>
         </nav>
@@ -99,6 +100,11 @@
           <li class="quest-card">Recover the <strong>Obsidian Keystone</strong> from the ash tunnels.</li>
           <li class="quest-card">Escort a caravan through the <strong>Wyrmwood</strong> after sundown.</li>
         </ul>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem">
+          <button class="button" id="genQuest">Generate random quest (web)</button>
+          <button class="button" id="genQuest3">Generate 3</button>
+          <small class="muted">Powered by Open5e monsters.</small>
+        </div>
       </div>
       <div class="card">
         <h3>Tips</h3>
@@ -150,11 +156,37 @@
           <option value="lizardfolk">Lizardfolk</option>
         </select>
         <button class="button" id="genName" style="margin-top:.6rem">Forge Name</button>
+        <button class="button" id="genNameApi" style="margin-top:.6rem; margin-left:.4rem">Forge via API (web)</button>
+        <small class="muted">Uses fantasyname.lukewh.com; falls back to local if offline.</small>
         <div id="nameOut" aria-live="polite" style="margin-top: .8rem; font-size:1.25rem"></div>
       </div>
       <div class="card">
         <h3>How to customize</h3>
         <p>Open the script at the bottom of this file and add or remove names in the arrays.</p>
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="backstory" class="grid grid-2">
+      <div class="card">
+        <h3>Backstory Forge</h3>
+        <p class="muted">Pick a race and class. We'll pull a random <em>Background</em> and prompts from the Open5e API and stitch a seed idea.</p>
+        <label for="backRace">Race</label>
+        <select id="backRace">
+          <option>Human</option><option>Elf</option><option>Dwarf</option><option>Orc</option><option>Lizardfolk</option>
+        </select>
+        <label for="backClass">Class</label>
+        <select id="backClass">
+          <option>Barbarian</option><option>Bard</option><option>Cleric</option><option>Druid</option><option>Fighter</option><option>Monk</option><option>Paladin</option><option>Ranger</option><option>Rogue</option><option>Sorcerer</option><option>Warlock</option><option>Wizard</option>
+        </select>
+        <button class="button" id="genBack" style="margin-top:.6rem">Forge Backstory (web)</button>
+        <div id="backOut" aria-live="polite" style="margin-top:.8rem"></div>
+        <small class="muted">Powered by <a href="https://open5e.com/api-docs" target="_blank" rel="noopener">Open5e</a>. No account needed.</small>
+      </div>
+      <div class="card">
+        <h3>What it makes</h3>
+        <p>One‑paragraph hooks using a random background's connections and mementos—great for kickstarting a character or NPC.</p>
       </div>
     </section>
 
@@ -266,6 +298,113 @@
       const name = pick(set);
       nameOut.textContent = name;
     });
+
+    /* ===== API-powered extras (inserted) ===== */
+    // Name API button (lukewh)
+    (function(){
+      const genApi = document.getElementById('genNameApi');
+      if (!genApi) return;
+      const raceSelect = document.getElementById('raceSelect');
+      const nameOut = document.getElementById('nameOut');
+      async function forgeNameFromAPI(style){
+        const ancestryMap = { human:'h', dwarf:'d', elf:'e', orc:'o', lizardfolk:'h' };
+        const a = ancestryMap[style] || 'h';
+        const url = 'https://fantasyname.lukewh.com/?family=t&ancestry=' + a;
+        try {
+          const res = await fetch(url, {mode:'cors'});
+          const text = await res.text();
+          const cleaned = text.split('
+').join(' ').trim();
+          nameOut.textContent = cleaned || 'Unnamed wanderer';
+        } catch (e){
+          // fallback to local
+          const N = window.NAMES || {human:['Alaric','Mira']};
+          const set = N[style] || N.human;
+          nameOut.textContent = set[Math.floor(Math.random()*set.length)] || 'Traveler';
+        }
+      }
+      genApi.addEventListener('click', ()=> forgeNameFromAPI(raceSelect.value));
+    })();
+
+    // Quest generator (Open5e monsters)
+    ;(function(){
+      const btn = document.getElementById('genQuest');
+      const btn3 = document.getElementById('genQuest3');
+      const list = document.getElementById('questList');
+      if (!btn || !list) return;
+      const LOCS = ['the Lantern Market','Wyrmwood Edge','the Ash Tunnels','the Oniron Archives','the Moonfen','Stormglass Cliffs','the Ember Docks'];
+      function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+      async function randomMonster(){
+        let count = Number(sessionStorage.getItem('o5e_mon_count')) || 0;
+        if (!count){
+          const meta = await fetch('https://api.open5e.com/v1/monsters/?limit=1');
+          const js = await meta.json();
+          count = js.count || 1000;
+          sessionStorage.setItem('o5e_mon_count', String(count));
+        }
+        const offset = Math.floor(Math.random()*count);
+        const res = await fetch('https://api.open5e.com/v1/monsters/?limit=1&offset=' + offset);
+        const data = await res.json();
+        return (data.results||[])[0];
+      }
+      function questLine(mon){
+        const place = pick(LOCS);
+        const cr = mon.cr ?? mon.challenge_rating ?? '?';
+        const verbs = ['Hunt','Investigate','Protect','Recover','Escort','Disrupt','Track'];
+        return pick(verbs) + ' a <strong>' + mon.name + '</strong> near <strong>' + place + '</strong> (CR ' + cr + ').';
+      }
+      async function addQuest(){
+        try {
+          const m = await randomMonster();
+          if (!m) return;
+          const li = document.createElement('li');
+          li.className = 'quest-card';
+          li.innerHTML = questLine(m);
+          list.prepend(li);
+        } catch(e){}
+      }
+      btn.addEventListener('click', addQuest);
+      btn3?.addEventListener('click', async ()=>{ await addQuest(); await addQuest(); await addQuest(); });
+    })();
+
+    // Backstory Forge (Open5e backgrounds)
+    ;(function(){
+      const btn = document.getElementById('genBack');
+      const out = document.getElementById('backOut');
+      const race = document.getElementById('backRace');
+      const klass = document.getElementById('backClass');
+      if (!btn) return;
+      async function randomBackground(){
+        let count = Number(sessionStorage.getItem('o5e_bg_count')) || 0;
+        if (!count){
+          const meta = await fetch('https://api.open5e.com/v2/backgrounds/?limit=1');
+          const js = await meta.json();
+          count = js.count || 50;
+          sessionStorage.setItem('o5e_bg_count', String(count));
+        }
+        const offset = Math.floor(Math.random()*count);
+        const res = await fetch('https://api.open5e.com/v2/backgrounds/?limit=1&offset=' + offset);
+        const data = await res.json();
+        return (data.results||[])[0];
+      }
+      function firstSentence(s){
+        if (!s) return '';
+        const flat = s.split('
+').join(' ');
+        const idx = flat.indexOf('.');
+        return idx>0 ? flat.slice(0, idx+1) : flat;
+      }
+      btn.addEventListener('click', async ()=>{
+        out.textContent = 'Forging…';
+        try {
+          const bg = await randomBackground();
+          const conn = (bg.benefits||[]).find(b=>String(b.type).includes('connection'))?.desc || '';
+          const mem  = (bg.benefits||[]).find(b=>String(b.type).includes('memento'))?.desc || '';
+          const idea = 'You are a ' + race.value.toLowerCase() + ' ' + klass.value.toLowerCase() + ' with the <strong>' + bg.name + '</strong> background. ' + firstSentence(conn) + ' ' + firstSentence(mem);
+          out.innerHTML = idea.trim();
+        } catch(e){ out.textContent = 'Could not reach Open5e right now—try again later.'; }
+      });
+    })();
 
     /* ===== Misc ===== */
     document.getElementById('year').textContent = new Date().getFullYear();
