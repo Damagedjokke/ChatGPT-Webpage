@@ -4,203 +4,242 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Ember Ledger</title>
-  <meta name="description" content="A tiny fantasy-themed website with a quest board, dice roller, name forge, and more. 100% offline-capable.">
+  <meta name="description" content="A tiny fantasy-themed website with a quest board, dice roller, name forge, and more. Perfect for GitHub Pages." />
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <!-- Favicon (inline SVG) -->
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path fill="%23c084fc" d="M64 8c8 24 28 26 28 48 0 18-14 32-28 48C50 88 36 74 36 56c0-22 20-24 28-48z"/></svg>' />
   <style>
-    :root{
-      --bg:#0b0e14; --fg:#e8e6df; --muted:#b2b6c0; --accent:#c084fc;
-      --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.12); --glow:rgba(192,132,252,.5);
+    :root {
+      --bg: #0b0e14;
+      --fg: #e8e6df;
+      --muted: #b2b6c0;
+      --accent: #c084fc;
+      --card: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --glow: rgba(192,132,252,.5);
     }
-    .light{ --bg:#f8f7f3; --fg:#1d1c1a; --muted:#5a5e66; --card:rgba(0,0,0,.04); --border:rgba(0,0,0,.08); --glow:rgba(147,197,253,.5) }
-    *{box-sizing:border-box}
-    html, body { color-scheme: dark light; }
-    .light { color-scheme: light dark; }
-
-    body{margin:0; font-family:'Spectral',serif; background:var(--bg); color:var(--fg); line-height:1.6}
-    header{position:sticky; top:0; backdrop-filter:saturate(1.2) blur(6px); background:linear-gradient( to right, rgba(0,0,0,.3), rgba(0,0,0,.1)); border-bottom:1px solid var(--border); z-index:10}
-    .container{max-width:1050px; padding:1rem; margin:0 auto}
-    .brand{font-family:'UnifrakturMaguntia',cursive; font-size:clamp(1.3rem,2vw + 1rem,2.1rem)}
-    nav a{margin-right:1rem; color:var(--fg); text-decoration:none; opacity:.85} nav a:hover{opacity:1; text-decoration:underline; text-underline-offset:4px}
-    .hero{position:relative; padding:6rem 0 4rem; overflow:hidden; border-bottom:1px solid var(--border)}
-    .hero h1{font-family:'UnifrakturMaguntia',cursive; font-size:clamp(2rem,5vw + 1rem,4rem); margin:0 0 .5rem}
-    .button{display:inline-block; padding:.7rem 1rem; border-radius:999px; border:1px solid var(--border); background:linear-gradient(180deg, var(--card), transparent); color:var(--fg); text-decoration:none; cursor:pointer; box-shadow:0 0 0 .5px var(--border), 0 10px 25px -15px var(--glow)}
-    .grid{display:grid; gap:1rem}
-    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1rem; box-shadow:0 10px 30px -20px rgba(0,0,0,.5)}
-    label{display:block; font-weight:600; margin:.5rem 0 .2rem}
-    input[type="text"],input[type="number"],select{width:100%; padding:.6rem .7rem; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--fg)}
-    hr.sep{border:0; height:1px; background:var(--border); margin:2rem 0}
-    footer{border-top:1px solid var(--border); padding:2rem 0; margin-top:2rem}
-    .switch{display:inline-flex; align-items:center; gap:.5rem}
-    .switch input{appearance:none; width:46px; height:26px; background:var(--card); border:1px solid var(--border); border-radius:999px; position:relative; cursor:pointer}
-    .switch input::after{content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:var(--fg); transition:transform .2s}
-    .switch input:checked::after{transform:translateX(20px)}
-    #sky,#fog{position:absolute; inset:0; z-index:-1}
-    #sky{background:radial-gradient(600px 300px at 50% -10%, rgba(255,255,255,.15), transparent), radial-gradient(800px 400px at 10% 10%, rgba(192,132,252,.15), transparent), radial-gradient(800px 400px at 90% 15%, rgba(96,165,250,.12), transparent)}
-    #fog{background:radial-gradient(700px 200px at 30% 120%, rgba(255,255,255,.06), transparent), radial-gradient(700px 200px at 70% 120%, rgba(255,255,255,.06), transparent); filter:blur(10px); animation:drift 20s linear infinite alternate}
-    @keyframes drift{to{transform:translateY(20px)}}
-    .muted{color:var(--muted)}
-    .flash{box-shadow:0 0 0 2px var(--glow) inset}
-
-    /* High-contrast select for Name Forge (works in dark mode) */
+    .light {
+      --bg: #f8f7f3;
+      --fg: #1d1c1a;
+      --muted: #5a5e66;
+      --card: rgba(0,0,0,.04);
+      --border: rgba(0,0,0,.08);
+      --glow: rgba(147,197,253,.5);
+    }
+    * { box-sizing: border-box }
+    body { margin:0; font-family: 'Spectral', system-ui, serif; background: var(--bg); color: var(--fg); line-height:1.6; }
+    header { position:sticky; top:0; backdrop-filter:saturate(1.2) blur(6px); background: linear-gradient( to right, rgba(0,0,0,.3), rgba(0,0,0,.1) ); border-bottom:1px solid var(--border); z-index:10; }
+    .container { max-width: 1050px; padding: 1rem; margin: 0 auto; }
+    .brand { font-family:'UnifrakturMaguntia', cursive; font-size: clamp(1.3rem, 2vw + 1rem, 2.1rem); letter-spacing:.5px }
+    nav a { margin-right:1rem; text-decoration:none; color:var(--fg); opacity: .85 }
+    nav a:hover { opacity:1; text-decoration: underline; text-underline-offset: 4px}
+    .hero { position: relative; padding: 6rem 0 4rem; overflow:hidden; border-bottom:1px solid var(--border); }
+    .hero h1 { font-family:'UnifrakturMaguntia', cursive; font-size: clamp(2rem, 5vw + 1rem, 4rem); margin:0 0 0.5rem }
+    .hero p { max-width: 60ch; opacity:.9 }
+    .button { display:inline-block; padding:.7rem 1rem; border-radius: 999px; border:1px solid var(--border); background: linear-gradient(180deg, var(--card), transparent); cursor:pointer; color:var(--fg); text-decoration:none; box-shadow: 0 0 0 .5px var(--border), 0 10px 25px -15px var(--glow); }
+    .button:hover { transform: translateY(-1px) }
+    .grid { display:grid; gap:1rem }
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr } .grid-3 { grid-template-columns: repeat(3,1fr) } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding:1rem; box-shadow: 0 10px 30px -20px rgba(0,0,0,.5) }
+    .card h3 { margin:.2rem 0 .6rem }
+    label { display:block; font-weight:600; margin:.5rem 0 .2rem }
+    input[type="text"], input[type="number"], select { width:100%; padding:.6rem .7rem; border-radius:12px; border:1px solid var(--border); background: transparent; color:var(--fg) }
+    hr.sep { border:0; height:1px; background: var(--border); margin: 2rem 0 }
+    footer { border-top:1px solid var(--border); padding: 2rem 0; margin-top: 2rem }
+    small.muted { color: var(--muted) }
+    .switch { display:inline-flex; align-items:center; gap:.5rem }
+    .switch input { appearance: none; width:46px; height:26px; background: var(--card); border:1px solid var(--border); border-radius:999px; position: relative; cursor:pointer }
+    .switch input::after { content:''; position:absolute; top:2px; left:2px; width:20px;height:20px;border-radius:50%; background: var(--fg); transition: transform .2s }
+    .switch input:checked::after { transform: translateX(20px) }
+    #sky, #fog { position:absolute; inset:0; z-index:-1; }
+    #sky { background: radial-gradient(600px 300px at 50% -10%, rgba(255,255,255,.15), transparent), radial-gradient(800px 400px at 10% 10%, rgba(192,132,252,.15), transparent), radial-gradient(800px 400px at 90% 15%, rgba(96,165,250,.12), transparent); }
+    #fog { background: radial-gradient(700px 200px at 30% 120%, rgba(255,255,255,.06), transparent), radial-gradient(700px 200px at 70% 120%, rgba(255,255,255,.06), transparent); filter: blur(10px); animation: drift 20s linear infinite alternate }
+    @keyframes drift { to { transform: translateY(20px) } }
+    kbd { border:1px solid var(--border); border-radius:6px; padding:0 .3rem; background: var(--card); }
+    .visually-hidden { position:absolute !important; clip: rect(1px,1px,1px,1px); padding:0 !important; border:0 !important; height:1px !important; width:1px !important; overflow:hidden }
+    .flash { box-shadow: 0 0 0 2px var(--glow) inset }
+  
+    /* High-contrast select just for Name Forge (white bg / dark text) */
     #raceSelect, #raceSelect option { background:#ffffff !important; color:#111111 !important; }
-    #raceSelect { border-color: #d0d0d0; }
-    
-    /* Quest management UI */
-    .quest-actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem }
-    .quest-input { flex:1 1 320px; min-width:240px; max-width:640px }
-    li.quest-card { position: relative; padding-right: 2rem; }
-    .quest-del { position:absolute; right:.25rem; top:.25rem; border:none; background:transparent; color:var(--muted); cursor:pointer; font-size:1rem; line-height:1; }
-    .quest-del:hover { color: var(--fg); }
+    #raceSelect { border-color:#d0d0d0; }
+
+    /* Backstory selects follow the theme (dark in dark mode) */
+    #backRace, #backClass { background: var(--bg); color: var(--fg); border-color: var(--border); }
+    #backRace option, #backClass option { background: var(--bg); color: var(--fg); }
   </style>
 </head>
 <body>
-<header>
-  <div class="container">
-    <div class="grid" style="align-items:center">
-      <div class="brand">The Ember Ledger</div>
-      <nav style="justify-self:end">
-        <a href="#quests">Quests</a>
-        <a href="#dice">Dice</a>
-        <a href="#names">Name Forge</a>
-        <a href="#backstory">Backstory</a>
-        <a href="#map">Map</a>
-        <span class="switch"><input id="themeToggle" type="checkbox" role="switch" aria-label="Toggle theme"></span>
-      </nav>
-    </div>
-  </div>
-</header>
-
-<section class="hero">
-  <div id="sky"></div><div id="fog"></div>
-  <div class="container">
-    <h1>Welcome, traveler.</h1>
-    <p>Everything on this page is offline-capable. Click the buttons and have fun ✨</p>
-    <a class="button" href="#quests">Begin your quest</a>
-  </div>
-</section>
-
-<main class="container">
-  <!-- Quests -->
-  <section id="quests" class="grid">
-    <div class="card">
-      <h3>Quest Board</h3>
-      <label for="questSearch">Search</label>
-      <input id="questSearch" type="text" placeholder="Type to filter quests… (e.g., dragon, ruins)">
-      <ul id="questList">
-        <li class="quest-card">Investigate the <strong>whispering ruins</strong> by the moonlit fen.</li>
-        <li class="quest-card">Broker peace between the <strong>Ember Guild</strong> and the river wardens.</li>
-        <li class="quest-card">Recover the <strong>Obsidian Keystone</strong> from the ash tunnels.</li>
-        <li class="quest-card">Escort a caravan through the <strong>Wyrmwood</strong> after sundown.</li>
-      </ul>
-      <div class="quest-actions">
-        <input id="questInput" class="quest-input" type="text" placeholder="Write a quest… e.g., Track a lantern revenant near Stormglass Cliffs.">
-        <button class="button" id="addQuestBtn">Add quest</button>
-        <button class="button" id="genQuest">Random (local)</button>
-        <button class="button" id="genQuest3">+3</button>
-        <button class="button" id="clearQuestsBtn" title="Remove all quests">Clear all</button>
+  <header>
+    <div class="container">
+      <div class="grid grid-2" style="align-items:center">
+        <div class="brand">The Ember Ledger</div>
+        <nav style="justify-self:end">
+          <a href="#quests">Quests</a>
+          <a href="#dice">Dice</a>
+          <a href="#names">Name Forge</a>
+          <a href="#backstory">Backstory</a>
+          <a href="#map">Map</a>
+          <span class="switch" aria-label="Toggle day/night theme"><input id="themeToggle" type="checkbox" role="switch" aria-checked="false" aria-label="Toggle theme"><label for="themeToggle" class="visually-hidden">Theme</label></span>
+        </nav>
       </div>
     </div>
+  </header>
+
+  <section class="hero">
+    <div id="sky"></div><div id="fog"></div>
+    <div class="container">
+      <h1>Welcome, traveler.</h1>
+      <p>Behold a tiny, hand‑forged fantasy site: a quest board you can edit, a dice roller for fate, a forge for names, and a pocket map of places. It’s all one file—easy to tweak and perfect for GitHub Pages.</p>
+      <a class="button" href="#quests">Begin your quest</a>
+    </div>
   </section>
 
-  <hr class="sep">
-
-  <!-- Dice -->
-  <section id="dice" class="grid">
-    <div class="card">
-      <h3>Dice Roller</h3>
-      <div style="display:flex; gap:.5rem; flex-wrap: wrap; margin:.5rem 0">
-        <button class="button die" data-sides="4">d4</button>
-        <button class="button die" data-sides="6">d6</button>
-        <button class="button die" data-sides="8">d8</button>
-        <button class="button die" data-sides="10">d10</button>
-        <button class="button die" data-sides="12">d12</button>
-        <button class="button die" data-sides="20">d20</button>
-        <button class="button die" data-sides="100">d100</button>
+  <main class="container">
+    <section id="quests" class="grid grid-2">
+      <div class="card">
+        <h3>Quest Board</h3>
+        <p class="muted">🔧 <em>Edit these directly in the HTML—look for the <code>&lt;ul id="questList"&gt;</code> below.</em></p>
+        <label for="questSearch">Search</label>
+        <input id="questSearch" type="text" placeholder="Type to filter quests… (e.g., dragon, ruins)">
+        <ul id="questList">
+          <li class="quest-card">Investigate the <strong>whispering ruins</strong> by the moonlit fen.</li>
+          <li class="quest-card">Broker peace between the <strong>Ember Guild</strong> and the river wardens.</li>
+          <li class="quest-card">Recover the <strong>Obsidian Keystone</strong> from the ash tunnels.</li>
+          <li class="quest-card">Escort a caravan through the <strong>Wyrmwood</strong> after sundown.</li>
+        </ul>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem">
+          <button class="button" id="genQuest">Generate random quest (web)</button>
+          <button class="button" id="genQuest3">Generate 3</button>
+          <small class="muted">Powered by Open5e monsters.</small>
+        </div>
       </div>
-      <label for="diceCount">Number of dice</label>
-      <input id="diceCount" type="number" min="1" max="20" value="1">
-      <label for="diceSides">Custom sides (optional)</label>
-      <input id="diceSides" type="number" min="2" max="1000" placeholder="e.g., 7">
-      <div aria-live="polite" id="diceOutput" style="margin-top:.8rem"></div>
-    </div>
-  </section>
-
-  <hr class="sep">
-
-  <!-- Names -->
-  <section id="names" class="grid">
-    <div class="card">
-      <h3>Name Forge</h3>
-      <label for="raceSelect">Style</label>
-      <select id="raceSelect" aria-label="Select name style">
-        <option value="elf">Elf</option>
-        <option value="dwarf">Dwarf</option>
-        <option value="human">Human</option>
-        <option value="lizardfolk">Lizardfolk</option>
-        <option value="orc">Orc</option>
-      </select>
-      <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem">
-        <button class="button" id="genName">Forge Name</button>
-        <button class="button" id="genNameApi">Forge via API (web)</button>
+      <div class="card">
+        <h3>Tips</h3>
+        <ul>
+          <li><strong>Change the title</strong>: edit the text “The Ember Ledger” in the header.</li>
+          <li><strong>Add a quest</strong>: copy a <code>&lt;li class="quest-card"&gt;…&lt;/li&gt;</code> and edit the text.</li>
+          <li><strong>Colors</strong>: tweak the CSS variables at the top of the file.</li>
+        </ul>
       </div>
-      <div id="nameOut" aria-live="polite" style="margin-top:.8rem; font-size:1.25rem"></div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="dice" class="grid grid-2">
+      <div class="card">
+        <h3>Dice Roller</h3>
+        <div style="display:flex; gap:.5rem; flex-wrap: wrap; margin:.5rem 0">
+          <button class="button die" data-sides="4">d4</button>
+          <button class="button die" data-sides="6">d6</button>
+          <button class="button die" data-sides="8">d8</button>
+          <button class="button die" data-sides="10">d10</button>
+          <button class="button die" data-sides="12">d12</button>
+          <button class="button die" data-sides="20">d20</button>
+          <button class="button die" data-sides="100">d100</button>
+        </div>
+        <label for="diceCount">Number of dice</label>
+        <input id="diceCount" type="number" min="1" max="20" value="1">
+        <label for="diceSides">Custom sides (optional)</label>
+        <input id="diceSides" type="number" min="2" max="1000" placeholder="e.g., 7">
+        <div aria-live="polite" id="diceOutput" style="margin-top:.8rem"></div>
+      </div>
+      <div class="card">
+        <h3>Shortcuts</h3>
+        <p>Press <kbd>1</kbd>..<kbd>7</kbd> to roll d4/d6/d8/d10/d12/d20/d100 quickly.</p>
+        <p><em>The last total is stored so you can compare rolls.</em></p>
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="names" class="grid grid-2">
+      <div class="card">
+        <h3>Name Forge</h3>
+        <label for="raceSelect">Style</label>
+        <select id="raceSelect" aria-label="Select name style">
+          <option value="elf">Elf</option>
+          <option value="dwarf">Dwarf</option>
+          <option value="human">Human</option>
+          <option value="lizardfolk">Lizardfolk</option>
+        </select>
+        <button class="button" id="genName" style="margin-top:.6rem">Forge Name</button>
+        <button class="button" id="genNameApi" style="margin-top:.6rem; margin-left:.4rem">Forge via API (web)</button>
+        <small class="muted">Uses fantasyname.lukewh.com; falls back to local if offline.</small>
+        <div id="nameOut" aria-live="polite" style="margin-top: .8rem; font-size:1.25rem"></div>
+      </div>
+      <div class="card">
+        <h3>How to customize</h3>
+        <p>Open the script at the bottom of this file and add or remove names in the arrays.</p>
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="backstory" class="grid grid-2">
+      <div class="card">
+        <h3>Backstory Forge</h3>
+        <p class="muted">Pick a race and class. We'll pull a random <em>Background</em> and prompts from the Open5e API and stitch a seed idea.</p>
+        <label for="backRace">Race</label>
+        <select id="backRace">
+          <option>Human</option><option>Elf</option><option>Dwarf</option><option>Orc</option><option>Lizardfolk</option>
+        </select>
+        <label for="backClass">Class</label>
+        <select id="backClass">
+          <option>Barbarian</option><option>Bard</option><option>Cleric</option><option>Druid</option><option>Fighter</option><option>Monk</option><option>Paladin</option><option>Ranger</option><option>Rogue</option><option>Sorcerer</option><option>Warlock</option><option>Wizard</option>
+        </select>
+        <button class="button" id="genBack" style="margin-top:.6rem">Forge Backstory (web)</button>
+        <div id="backOut" aria-live="polite" style="margin-top:.8rem"></div>
+        <small class="muted">Powered by <a href="https://open5e.com/api-docs" target="_blank" rel="noopener">Open5e</a>. No account needed.</small>
+      </div>
+      <div class="card">
+        <h3>What it makes</h3>
+        <p>One‑paragraph hooks using a random background's connections and mementos—great for kickstarting a character or NPC.</p>
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="map" class="grid grid-2">
+      <div class="card">
+        <h3>Pocket Map</h3>
+        <details open>
+          <summary>🕯️ The Lantern Market</summary>
+          A tangle of alleys where glassblowers sell bottled starlight.
+        </details>
+        <details>
+          <summary>🍃 Wyrmwood Edge</summary>
+          Owls whisper warnings. Travelers leave offerings of copper.
+        </details>
+        <details>
+          <summary>⛰️ The Ash Tunnels</summary>
+          Lava‑scarred caverns where the Obsidian Keystone once lay.
+        </details>
+        <details>
+          <summary>🏛️ Oniron Archives</summary>
+          Stacks of vellum. Librarians measure time by candle height.
+        </details>
+      </div>
+      <div class="card">
+        <h3>About this site</h3>
+        <p>This is a single <strong>index.html</strong> you can drop into a GitHub Pages repo. No build tools, no dependencies.</p>
+        <p>Want more pages later? Add <code>about.html</code> and link to it from the nav.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container grid grid-2">
+      <div>
+        <small class="muted">© <span id="year"></span> Your Name. Crafted with HTML, CSS, and vanilla JS.</small>
+      </div>
+      <div style="justify-self:end">
+        <a class="button" href="#top">Back to top</a>
+      </div>
     </div>
-  </section>
+  </footer>
 
-  <hr class="sep">
-
-  <!-- Backstory -->
-  <section id="backstory" class="grid">
-    <div class="card">
-      <h3>Backstory Forge</h3>
-      <p class="muted">Pick a race and class. We’ll stitch a one-paragraph seed locally.</p>
-      <label for="backRace">Race</label>
-      <select id="backRace">
-        <option>Human</option><option>Elf</option><option>Dwarf</option><option>Orc</option><option>Lizardfolk</option>
-      </select>
-      <label for="backClass">Class</label>
-      <select id="backClass">
-        <option>Barbarian</option><option>Bard</option><option>Cleric</option><option>Druid</option><option>Fighter</option><option>Monk</option><option>Paladin</option><option>Ranger</option><option>Rogue</option><option>Sorcerer</option><option>Warlock</option><option>Wizard</option>
-      </select>
-      <button class="button" id="genBack" style="margin-top:.6rem">Forge Backstory</button>
-      <div id="backOut" aria-live="polite" style="margin-top:.8rem"></div>
-    </div>
-  </section>
-
-  <hr class="sep">
-
-  <!-- Map -->
-  <section id="map" class="grid">
-    <div class="card">
-      <h3>Pocket Map</h3>
-      <details open>
-        <summary>🕯️ The Lantern Market</summary>
-        A tangle of alleys where glassblowers sell bottled starlight.
-      </details>
-      <details>
-        <summary>🍃 Wyrmwood Edge</summary>
-        Owls whisper warnings. Travelers leave offerings of copper.
-      </details>
-      <details>
-        <summary>⛰️ The Ash Tunnels</summary>
-        Lava-scarred caverns where the Obsidian Keystone once lay.
-      </details>
-      <details>
-        <summary>🏛️ Oniron Archives</summary>
-        Stacks of vellum. Librarians measure time by candle height.
-      </details>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="container grid">
-    <div><small class="muted">© <span id="year"></span> Your Name. HTML + CSS + vanilla JS.</small></div>
-    <div style="justify-self:end"><a class="button" href="#top">Back to top</a></div>
-  </div>
-</footer>
-
-<script>
+  <script>
   // ===== Theme =====
   (function(){
     var root = document.documentElement;
@@ -297,21 +336,23 @@
       out.textContent = window.pick(set);
     }
     btn.addEventListener('click', function(){
-      out.textContent = "Forging…";
+      out.textContent = 'Forging…';
       var map = { human:'h', dwarf:'d', elf:'e', orc:'o', lizardfolk:'h' };
       var a = map[race.value] || 'h';
       var url = 'https://fantasyname.lukewh.com/?family=t&ancestry=' + a;
-      fetch(url, {mode:'cors'})
+      fetch(url, { mode:'cors' })
         .then(function(res){ return res.text(); })
         .then(function(txt){
-          var cleaned = (txt||'').replace(/\r?\n/g,' ').trim();
+          var cleaned = (txt||'').replace(/
+?
+/g,' ').trim();
           if (cleaned) out.textContent = cleaned; else fallback();
         })
         .catch(fallback);
     });
   })();
 
-  // ===== Quest generator + manage (add/delete/persist) =====
+  // ===== Local quest generator + manage (add/delete/persist) =====
   (function(){
     var list = document.getElementById('questList');
     var addBtn = document.getElementById('addQuestBtn');
@@ -377,7 +418,7 @@
     load();
   })();
 
-  // ===== Backstory generator (local) =====
+  // ===== Local backstory generator =====
   (function(){
     var btn = document.getElementById('genBack');
     var out = document.getElementById('backOut');
