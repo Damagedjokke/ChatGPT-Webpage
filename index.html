@@ -38,9 +38,24 @@
     .muted{color:var(--muted)}
     .flash{box-shadow:0 0 0 2px var(--glow) inset}
 
-    /* >>> Only change you asked for: readable dropdown text in dark mode <<< */
-    /* Make Name Forge + Backstory selects use white background + dark text for max contrast */
+    /* Readable selects in dark mode (white bg, dark text) */
     #raceSelect, #backRace, #backClass { background:#ffffff !important; color:#111111 !important; border-color:#d0d0d0; }
+
+    /* Align delete buttons and reserve space on the right */
+    ul#questList { list-style: none; margin: 0; padding-left: 0; }
+    li.quest-card { position: relative; padding-right: 2.25rem; }
+    .quest-del {
+      position: absolute;
+      right: .25rem;
+      top: .35rem;          /* align in a neat column */
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .quest-del:hover { color: var(--fg); }
   </style>
 </head>
 <body>
@@ -300,68 +315,121 @@
     });
   })();
 
-  // ===== Quest generator + manage (add/delete/persist) =====
-  (function(){
-    var list = document.getElementById('questList');
-    var addBtn = document.getElementById('addQuestBtn');
-    var input = document.getElementById('questInput');
+  // ===== Local quest generator + manage (add/delete/persist) =====
+  (function () {
+    var list    = document.getElementById('questList');
+    var addBtn  = document.getElementById('addQuestBtn');
+    var input   = document.getElementById('questInput');
     var randBtn = document.getElementById('genQuest');
-    var rand3Btn = document.getElementById('genQuest3');
-    var clearBtn = document.getElementById('clearQuestsBtn');
+    var rand3Btn= document.getElementById('genQuest3');
+    var clearBtn= document.getElementById('clearQuestsBtn');
     if (!list) return;
 
-    function attachDelButton(li){
+    function attachDelButton(li) {
+      // remove any legacy buttons
+      var olds = li.querySelectorAll('.quest-del');
+      for (var i = 0; i < olds.length; i++) olds[i].remove();
+
       var b = document.createElement('button');
       b.className = 'quest-del';
-      b.setAttribute('aria-label','Delete quest');
+      b.setAttribute('aria-label', 'Delete quest');
       b.title = 'Delete';
       b.textContent = '×';
-      b.addEventListener('click', function(){ li.remove(); save(); });
+      b.addEventListener('click', function () {
+        li.remove();
+        save();
+      });
       li.appendChild(b);
     }
-    function save(){
-      var arr = []; var items = list.querySelectorAll('li.quest-card');
-      for (var i=0;i<items.length;i++){ arr.push(items[i].innerHTML); }
-      try{ localStorage.setItem('quests_v1', JSON.stringify(arr)); }catch(e){}
+
+    // Return pure quest HTML (no delete button)
+    function getContentHTML(li) {
+      if (li.dataset && li.dataset.content) return li.dataset.content;
+      var clone = li.cloneNode(true);
+      var dels = clone.querySelectorAll('.quest-del');
+      for (var i = 0; i < dels.length; i++) dels[i].remove();
+      return clone.innerHTML;
     }
-    function render(arr){
+
+    function save() {
+      var items = list.querySelectorAll('li.quest-card');
+      var arr = [];
+      for (var i = 0; i < items.length; i++) {
+        var html = getContentHTML(items[i]);
+        arr.push(html);
+      }
+      try { localStorage.setItem('quests_v1', JSON.stringify(arr)); } catch (e) {}
+    }
+
+    function render(arr) {
       list.innerHTML = '';
-      for (var i=0;i<arr.length;i++){
+      for (var i = 0; i < arr.length; i++) {
         var li = document.createElement('li');
         li.className = 'quest-card';
         li.innerHTML = arr[i];
+        li.dataset.content = arr[i];
         attachDelButton(li);
         list.appendChild(li);
       }
     }
-    function load(){
-      var stored = null; try{ stored = JSON.parse(localStorage.getItem('quests_v1') || 'null'); }catch(e){}
-      if (stored && Array.isArray(stored) && stored.length){ render(stored); }
-      else {
+
+    function load() {
+      var stored = null;
+      try { stored = JSON.parse(localStorage.getItem('quests_v1') || 'null'); } catch (e) {}
+      if (stored && Array.isArray(stored) && stored.length) {
+        render(stored);
+      } else {
+        // first run: mark existing <li> clean content, then add buttons
         var items = list.querySelectorAll('li.quest-card');
-        for (var i=0;i<items.length;i++){ attachDelButton(items[i]); }
+        for (var i = 0; i < items.length; i++) {
+          var li = items[i];
+          var olds = li.querySelectorAll('.quest-del');
+          for (var j = 0; j < olds.length; j++) olds[j].remove();
+          li.dataset.content = li.innerHTML;
+          attachDelButton(li);
+        }
         save();
       }
     }
-    function addText(text){
-      var t = (text||'').trim(); if (!t) return;
-      var li = document.createElement('li'); li.className = 'quest-card';
-      li.textContent = t; attachDelButton(li); list.prepend(li); save(); if (input) input.value='';
-    }
-    function randomQuest(){
-      var verb = window.pick(window.VERBS);
-      var mon = window.pick(window.MONSTERS);
-      var place = window.pick(window.LOCS);
-      var li = document.createElement('li'); li.className = 'quest-card';
-      li.innerHTML = verb + ' a <strong>' + mon + '</strong> near <strong>' + place + '</strong>.';
-      attachDelButton(li); list.prepend(li); save();
+
+    function addText(text) {
+      var t = (text || '').trim();
+      if (!t) return;
+      var li = document.createElement('li');
+      li.className = 'quest-card';
+      li.textContent = t;                 // plain text
+      li.dataset.content = li.innerHTML;  // clean content
+      attachDelButton(li);
+      list.prepend(li);
+      save();
+      if (input) input.value = '';
     }
 
-    if (addBtn && input) addBtn.addEventListener('click', function(){ addText(input.value); });
-    if (input) input.addEventListener('keydown', function(e){ if (e.key === 'Enter') addText(input.value); });
+    function randomQuest() {
+      var verb  = window.pick(window.VERBS);
+      var mon   = window.pick(window.MONSTERS);
+      var place = window.pick(window.LOCS);
+      var html  = verb + ' a <strong>' + mon + '</strong> near <strong>' + place + '</strong>.';
+
+      var li = document.createElement('li');
+      li.className = 'quest-card';
+      li.innerHTML = html;
+      li.dataset.content = html;
+      attachDelButton(li);
+      list.prepend(li);
+      save();
+    }
+
+    if (addBtn && input) addBtn.addEventListener('click', function () { addText(input.value); });
+    if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') addText(input.value); });
     if (randBtn) randBtn.addEventListener('click', randomQuest);
-    if (rand3Btn) rand3Btn.addEventListener('click', function(){ randomQuest(); randomQuest(); randomQuest(); });
-    if (clearBtn) clearBtn.addEventListener('click', function(){ if (confirm('Clear all quests?')){ list.innerHTML=''; save(); }});
+    if (rand3Btn) rand3Btn.addEventListener('click', function () { randomQuest(); randomQuest(); randomQuest(); });
+    if (clearBtn) clearBtn.addEventListener('click', function () {
+      if (confirm('Clear all quests?')) {
+        list.innerHTML = '';
+        save();
+      }
+    });
 
     load();
   })();
