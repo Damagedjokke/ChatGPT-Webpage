@@ -4,246 +4,233 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Ember Ledger</title>
-  <meta name="description" content="A tiny fantasy-themed website with a quest board, dice roller, name forge, and more. Perfect for GitHub Pages." />
-  <!-- Fonts -->
+  <meta name="description" content="A tiny fantasy-themed website with a quest board, dice roller, name forge, and more. 100% offline-capable.">
   <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <!-- Favicon (inline SVG) -->
-  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path fill="%23c084fc" d="M64 8c8 24 28 26 28 48 0 18-14 32-28 48C50 88 36 74 36 56c0-22 20-24 28-48z"/></svg>' />
   <style>
-    :root {
-      --bg: #0b0e14;
-      --fg: #e8e6df;
-      --muted: #b2b6c0;
-      --accent: #c084fc;
-      --card: rgba(255,255,255,.06);
-      --border: rgba(255,255,255,.12);
-      --glow: rgba(192,132,252,.5);
+    :root{
+      --bg:#0b0e14; --fg:#e8e6df; --muted:#b2b6c0; --accent:#c084fc;
+      --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.12); --glow:rgba(192,132,252,.5);
     }
-    .light {
-      --bg: #f8f7f3;
-      --fg: #1d1c1a;
-      --muted: #5a5e66;
-      --card: rgba(0,0,0,.04);
-      --border: rgba(0,0,0,.08);
-      --glow: rgba(147,197,253,.5);
-    }
-    * { box-sizing: border-box }
-    body { margin:0; font-family: 'Spectral', system-ui, serif; background: var(--bg); color: var(--fg); line-height:1.6; }
-    header { position:sticky; top:0; backdrop-filter:saturate(1.2) blur(6px); background: linear-gradient( to right, rgba(0,0,0,.3), rgba(0,0,0,.1) ); border-bottom:1px solid var(--border); z-index:10; }
-    .container { max-width: 1050px; padding: 1rem; margin: 0 auto; }
-    .brand { font-family:'UnifrakturMaguntia', cursive; font-size: clamp(1.3rem, 2vw + 1rem, 2.1rem); letter-spacing:.5px }
-    nav a { margin-right:1rem; text-decoration:none; color:var(--fg); opacity: .85 }
-    nav a:hover { opacity:1; text-decoration: underline; text-underline-offset: 4px}
-    .hero { position: relative; padding: 6rem 0 4rem; overflow:hidden; border-bottom:1px solid var(--border); }
-    .hero h1 { font-family:'UnifrakturMaguntia', cursive; font-size: clamp(2rem, 5vw + 1rem, 4rem); margin:0 0 0.5rem }
-    .hero p { max-width: 60ch; opacity:.9 }
-    .button { display:inline-block; padding:.7rem 1rem; border-radius: 999px; border:1px solid var(--border); background: linear-gradient(180deg, var(--card), transparent); cursor:pointer; color:var(--fg); text-decoration:none; box-shadow: 0 0 0 .5px var(--border), 0 10px 25px -15px var(--glow); }
-    .button:hover { transform: translateY(-1px) }
-    .grid { display:grid; gap:1rem }
-    @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr } .grid-3 { grid-template-columns: repeat(3,1fr) } }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding:1rem; box-shadow: 0 10px 30px -20px rgba(0,0,0,.5) }
-    .card h3 { margin:.2rem 0 .6rem }
-    label { display:block; font-weight:600; margin:.5rem 0 .2rem }
-    input[type="text"], input[type="number"], select { width:100%; padding:.6rem .7rem; border-radius:12px; border:1px solid var(--border); background: transparent; color:var(--fg) }
-    hr.sep { border:0; height:1px; background: var(--border); margin: 2rem 0 }
-    footer { border-top:1px solid var(--border); padding: 2rem 0; margin-top: 2rem }
-    small.muted { color: var(--muted) }
-    .switch { display:inline-flex; align-items:center; gap:.5rem }
-    .switch input { appearance: none; width:46px; height:26px; background: var(--card); border:1px solid var(--border); border-radius:999px; position: relative; cursor:pointer }
-    .switch input::after { content:''; position:absolute; top:2px; left:2px; width:20px;height:20px;border-radius:50%; background: var(--fg); transition: transform .2s }
-    .switch input:checked::after { transform: translateX(20px) }
-    #sky, #fog { position:absolute; inset:0; z-index:-1; }
-    #sky { background: radial-gradient(600px 300px at 50% -10%, rgba(255,255,255,.15), transparent), radial-gradient(800px 400px at 10% 10%, rgba(192,132,252,.15), transparent), radial-gradient(800px 400px at 90% 15%, rgba(96,165,250,.12), transparent); }
-    #fog { background: radial-gradient(700px 200px at 30% 120%, rgba(255,255,255,.06), transparent), radial-gradient(700px 200px at 70% 120%, rgba(255,255,255,.06), transparent); filter: blur(10px); animation: drift 20s linear infinite alternate }
-    @keyframes drift { to { transform: translateY(20px) } }
-    kbd { border:1px solid var(--border); border-radius:6px; padding:0 .3rem; background: var(--card); }
-    .visually-hidden { position:absolute !important; clip: rect(1px,1px,1px,1px); padding:0 !important; border:0 !important; height:1px !important; width:1px !important; overflow:hidden }
-    .flash { box-shadow: 0 0 0 2px var(--glow) inset }
+    .light{ --bg:#f8f7f3; --fg:#1d1c1a; --muted:#5a5e66; --card:rgba(0,0,0,.04); --border:rgba(0,0,0,.08); --glow:rgba(147,197,253,.5) }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:'Spectral',serif; background:var(--bg); color:var(--fg); line-height:1.6}
+    header{position:sticky; top:0; backdrop-filter:saturate(1.2) blur(6px); background:linear-gradient( to right, rgba(0,0,0,.3), rgba(0,0,0,.1)); border-bottom:1px solid var(--border); z-index:10}
+    .container{max-width:1050px; padding:1rem; margin:0 auto}
+    .brand{font-family:'UnifrakturMaguntia',cursive; font-size:clamp(1.3rem,2vw + 1rem,2.1rem)}
+    nav a{margin-right:1rem; color:var(--fg); text-decoration:none; opacity:.85} nav a:hover{opacity:1; text-decoration:underline; text-underline-offset:4px}
+    .hero{position:relative; padding:6rem 0 4rem; overflow:hidden; border-bottom:1px solid var(--border)}
+    .hero h1{font-family:'UnifrakturMaguntia',cursive; font-size:clamp(2rem,5vw + 1rem,4rem); margin:0 0 .5rem}
+    .button{display:inline-block; padding:.7rem 1rem; border-radius:999px; border:1px solid var(--border); background:linear-gradient(180deg, var(--card), transparent); color:var(--fg); text-decoration:none; cursor:pointer; box-shadow:0 0 0 .5px var(--border), 0 10px 25px -15px var(--glow)}
+    .grid{display:grid; gap:1rem} @media(min-width:768px){ .grid-2{grid-template-columns:1fr 1fr} }
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1rem; box-shadow:0 10px 30px -20px rgba(0,0,0,.5)}
+    label{display:block; font-weight:600; margin:.5rem 0 .2rem}
+    input[type="text"],input[type="number"],select{width:100%; padding:.6rem .7rem; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--fg)}
+    hr.sep{border:0; height:1px; background:var(--border); margin:2rem 0}
+    footer{border-top:1px solid var(--border); padding:2rem 0; margin-top:2rem}
+    .switch{display:inline-flex; align-items:center; gap:.5rem}
+    .switch input{appearance:none; width:46px; height:26px; background:var(--card); border:1px solid var(--border); border-radius:999px; position:relative; cursor:pointer}
+    .switch input::after{content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:var(--fg); transition:transform .2s}
+    .switch input:checked::after{transform:translateX(20px)}
+    #sky,#fog{position:absolute; inset:0; z-index:-1}
+    #sky{background:radial-gradient(600px 300px at 50% -10%, rgba(255,255,255,.15), transparent), radial-gradient(800px 400px at 10% 10%, rgba(192,132,252,.15), transparent), radial-gradient(800px 400px at 90% 15%, rgba(96,165,250,.12), transparent)}
+    #fog{background:radial-gradient(700px 200px at 30% 120%, rgba(255,255,255,.06), transparent), radial-gradient(700px 200px at 70% 120%, rgba(255,255,255,.06), transparent); filter:blur(10px); animation:drift 20s linear infinite alternate}
+    @keyframes drift{to{transform:translateY(20px)}}
+    .muted{color:var(--muted)}
+    .flash{box-shadow:0 0 0 2px var(--glow) inset}
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <div class="grid grid-2" style="align-items:center">
-        <div class="brand">The Ember Ledger</div>
-        <nav style="justify-self:end">
-          <a href="#quests">Quests</a>
-          <a href="#dice">Dice</a>
-          <a href="#names">Name Forge</a>
-          <a href="#backstory">Backstory</a>
-          <a href="#map">Map</a>
-          <span class="switch" aria-label="Toggle day/night theme"><input id="themeToggle" type="checkbox" role="switch" aria-checked="false" aria-label="Toggle theme"><label for="themeToggle" class="visually-hidden">Theme</label></span>
-        </nav>
+<header>
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center">
+      <div class="brand">The Ember Ledger</div>
+      <nav style="justify-self:end">
+        <a href="#quests">Quests</a>
+        <a href="#dice">Dice</a>
+        <a href="#names">Name Forge</a>
+        <a href="#backstory">Backstory</a>
+        <a href="#map">Map</a>
+        <span class="switch"><input id="themeToggle" type="checkbox" role="switch" aria-label="Toggle theme"></span>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div id="sky"></div><div id="fog"></div>
+  <div class="container">
+    <h1>Welcome, traveler.</h1>
+    <p>Everything on this page is offline-capable. Click the buttons and have fun ✨</p>
+    <a class="button" href="#quests">Begin your quest</a>
+  </div>
+</section>
+
+<main class="container">
+  <section id="quests" class="grid grid-2">
+    <div class="card">
+      <h3>Quest Board</h3>
+      <p class="muted">Search and generate local quests.</p>
+      <label for="questSearch">Search</label>
+      <input id="questSearch" type="text" placeholder="Type to filter quests… (e.g., dragon, ruins)">
+      <ul id="questList">
+        <li class="quest-card">Investigate the <strong>whispering ruins</strong> by the moonlit fen.</li>
+        <li class="quest-card">Broker peace between the <strong>Ember Guild</strong> and the river wardens.</li>
+        <li class="quest-card">Recover the <strong>Obsidian Keystone</strong> from the ash tunnels.</li>
+        <li class="quest-card">Escort a caravan through the <strong>Wyrmwood</strong> after sundown.</li>
+      </ul>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem">
+        <button class="button" id="genQuest">Generate quest (local)</button>
+        <button class="button" id="genQuest3">Generate 3</button>
       </div>
     </div>
-  </header>
-
-  <section class="hero">
-    <div id="sky"></div><div id="fog"></div>
-    <div class="container">
-      <h1>Welcome, traveler.</h1>
-      <p>Behold a tiny, hand‑forged fantasy site: a quest board you can edit, a dice roller for fate, a forge for names, and a pocket map of places. It’s all one file—easy to tweak and perfect for GitHub Pages.</p>
-      <a class="button" href="#quests">Begin your quest</a>
+    <div class="card">
+      <h3>Tips</h3>
+      <ul>
+        <li><strong>Change the title</strong>: edit “The Ember Ledger” in the header.</li>
+        <li><strong>Add a quest</strong>: copy a <code>&lt;li class="quest-card"&gt;…&lt;/li&gt;</code>.</li>
+        <li><strong>Colors</strong>: tweak the CSS variables at the top.</li>
+      </ul>
     </div>
   </section>
 
-  <main class="container">
-    <section id="quests" class="grid grid-2">
-      <div class="card">
-        <h3>Quest Board</h3>
-        <p class="muted">🔧 <em>Edit these directly in the HTML—look for the <code>&lt;ul id="questList"&gt;</code> below.</em></p>
-        <label for="questSearch">Search</label>
-        <input id="questSearch" type="text" placeholder="Type to filter quests… (e.g., dragon, ruins)">
-        <ul id="questList">
-          <li class="quest-card">Investigate the <strong>whispering ruins</strong> by the moonlit fen.</li>
-          <li class="quest-card">Broker peace between the <strong>Ember Guild</strong> and the river wardens.</li>
-          <li class="quest-card">Recover the <strong>Obsidian Keystone</strong> from the ash tunnels.</li>
-          <li class="quest-card">Escort a caravan through the <strong>Wyrmwood</strong> after sundown.</li>
-        </ul>
-        <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem">
-          <button class="button" id="genQuest">Generate random quest (web)</button>
-          <button class="button" id="genQuest3">Generate 3</button>
-          <small class="muted">Powered by Open5e monsters.</small>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Tips</h3>
-        <ul>
-          <li><strong>Change the title</strong>: edit the text “The Ember Ledger” in the header.</li>
-          <li><strong>Add a quest</strong>: copy a <code>&lt;li class="quest-card"&gt;…&lt;/li&gt;</code> and edit the text.</li>
-          <li><strong>Colors</strong>: tweak the CSS variables at the top of the file.</li>
-        </ul>
-      </div>
-    </section>
+  <hr class="sep">
 
-    <hr class="sep">
-
-    <section id="dice" class="grid grid-2">
-      <div class="card">
-        <h3>Dice Roller</h3>
-        <div style="display:flex; gap:.5rem; flex-wrap: wrap; margin:.5rem 0">
-          <button class="button die" data-sides="4">d4</button>
-          <button class="button die" data-sides="6">d6</button>
-          <button class="button die" data-sides="8">d8</button>
-          <button class="button die" data-sides="10">d10</button>
-          <button class="button die" data-sides="12">d12</button>
-          <button class="button die" data-sides="20">d20</button>
-          <button class="button die" data-sides="100">d100</button>
-        </div>
-        <label for="diceCount">Number of dice</label>
-        <input id="diceCount" type="number" min="1" max="20" value="1">
-        <label for="diceSides">Custom sides (optional)</label>
-        <input id="diceSides" type="number" min="2" max="1000" placeholder="e.g., 7">
-        <div aria-live="polite" id="diceOutput" style="margin-top:.8rem"></div>
+  <section id="dice" class="grid grid-2">
+    <div class="card">
+      <h3>Dice Roller</h3>
+      <div style="display:flex; gap:.5rem; flex-wrap: wrap; margin:.5rem 0">
+        <button class="button die" data-sides="4">d4</button>
+        <button class="button die" data-sides="6">d6</button>
+        <button class="button die" data-sides="8">d8</button>
+        <button class="button die" data-sides="10">d10</button>
+        <button class="button die" data-sides="12">d12</button>
+        <button class="button die" data-sides="20">d20</button>
+        <button class="button die" data-sides="100">d100</button>
       </div>
-      <div class="card">
-        <h3>Shortcuts</h3>
-        <p>Press <kbd>1</kbd>..<kbd>7</kbd> to roll d4/d6/d8/d10/d12/d20/d100 quickly.</p>
-        <p><em>The last total is stored so you can compare rolls.</em></p>
-      </div>
-    </section>
-
-    <hr class="sep">
-
-    <section id="names" class="grid grid-2">
-      <div class="card">
-        <h3>Name Forge</h3>
-        <label for="raceSelect">Style</label>
-        <select id="raceSelect" aria-label="Select name style">
-          <option value="elf">Elf</option>
-          <option value="dwarf">Dwarf</option>
-          <option value="human">Human</option>
-          <option value="lizardfolk">Lizardfolk</option>
-        </select>
-        <button class="button" id="genName" style="margin-top:.6rem">Forge Name</button>
-        <button class="button" id="genNameApi" style="margin-top:.6rem; margin-left:.4rem">Forge via API (web)</button>
-        <small class="muted">Uses fantasyname.lukewh.com; falls back to local if offline.</small>
-        <div id="nameOut" aria-live="polite" style="margin-top: .8rem; font-size:1.25rem"></div>
-      </div>
-      <div class="card">
-        <h3>How to customize</h3>
-        <p>Open the script at the bottom of this file and add or remove names in the arrays.</p>
-      </div>
-    </section>
-
-    <hr class="sep">
-
-    <section id="backstory" class="grid grid-2">
-      <div class="card">
-        <h3>Backstory Forge</h3>
-        <p class="muted">Pick a race and class. We'll pull a random <em>Background</em> and prompts from the Open5e API and stitch a seed idea.</p>
-        <label for="backRace">Race</label>
-        <select id="backRace">
-          <option>Human</option><option>Elf</option><option>Dwarf</option><option>Orc</option><option>Lizardfolk</option>
-        </select>
-        <label for="backClass">Class</label>
-        <select id="backClass">
-          <option>Barbarian</option><option>Bard</option><option>Cleric</option><option>Druid</option><option>Fighter</option><option>Monk</option><option>Paladin</option><option>Ranger</option><option>Rogue</option><option>Sorcerer</option><option>Warlock</option><option>Wizard</option>
-        </select>
-        <button class="button" id="genBack" style="margin-top:.6rem">Forge Backstory (web)</button>
-        <div id="backOut" aria-live="polite" style="margin-top:.8rem"></div>
-        <small class="muted">Powered by <a href="https://open5e.com/api-docs" target="_blank" rel="noopener">Open5e</a>. No account needed.</small>
-      </div>
-      <div class="card">
-        <h3>What it makes</h3>
-        <p>One‑paragraph hooks using a random background's connections and mementos—great for kickstarting a character or NPC.</p>
-      </div>
-    </section>
-
-    <hr class="sep">
-
-    <section id="map" class="grid grid-2">
-      <div class="card">
-        <h3>Pocket Map</h3>
-        <details open>
-          <summary>🕯️ The Lantern Market</summary>
-          A tangle of alleys where glassblowers sell bottled starlight.
-        </details>
-        <details>
-          <summary>🍃 Wyrmwood Edge</summary>
-          Owls whisper warnings. Travelers leave offerings of copper.
-        </details>
-        <details>
-          <summary>⛰️ The Ash Tunnels</summary>
-          Lava‑scarred caverns where the Obsidian Keystone once lay.
-        </details>
-        <details>
-          <summary>🏛️ Oniron Archives</summary>
-          Stacks of vellum. Librarians measure time by candle height.
-        </details>
-      </div>
-      <div class="card">
-        <h3>About this site</h3>
-        <p>This is a single <strong>index.html</strong> you can drop into a GitHub Pages repo. No build tools, no dependencies.</p>
-        <p>Want more pages later? Add <code>about.html</code> and link to it from the nav.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container grid grid-2">
-      <div>
-        <small class="muted">© <span id="year"></span> Your Name. Crafted with HTML, CSS, and vanilla JS.</small>
-      </div>
-      <div style="justify-self:end">
-        <a class="button" href="#top">Back to top</a>
-      </div>
+      <label for="diceCount">Number of dice</label>
+      <input id="diceCount" type="number" min="1" max="20" value="1">
+      <label for="diceSides">Custom sides (optional)</label>
+      <input id="diceSides" type="number" min="2" max="1000" placeholder="e.g., 7">
+      <div aria-live="polite" id="diceOutput" style="margin-top:.8rem"></div>
     </div>
-  </footer>
+    <div class="card">
+      <h3>Shortcuts</h3>
+      <p>Press 1..7 to roll d4/d6/d8/d10/d12/d20/d100 quickly.</p>
+    </div>
+  </section>
 
-  <script>
+  <hr class="sep">
+
+  <section id="names" class="grid grid-2">
+    <div class="card">
+      <h3>Name Forge</h3>
+      <label for="raceSelect">Style</label>
+      <select id="raceSelect" aria-label="Select name style">
+        <option value="elf">Elf</option>
+        <option value="dwarf">Dwarf</option>
+        <option value="human">Human</option>
+        <option value="lizardfolk">Lizardfolk</option>
+        <option value="orc">Orc</option>
+      </select>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.6rem">
+        <button class="button" id="genName">Forge Name</button>
+      </div>
+      <div id="nameOut" aria-live="polite" style="margin-top:.8rem; font-size:1.25rem"></div>
+    </div>
+    <div class="card">
+      <h3>How to customize</h3>
+      <p>All lists are inside the script—add/remove names and places freely.</p>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <section id="backstory" class="grid grid-2">
+    <div class="card">
+      <h3>Backstory Forge</h3>
+      <p class="muted">Pick a race and class. We’ll stitch a one-paragraph seed locally.</p>
+      <label for="backRace">Race</label>
+      <select id="backRace">
+        <option>Human</option><option>Elf</option><option>Dwarf</option><option>Orc</option><option>Lizardfolk</option>
+      </select>
+      <label for="backClass">Class</label>
+      <select id="backClass">
+        <option>Barbarian</option><option>Bard</option><option>Cleric</option><option>Druid</option><option>Fighter</option><option>Monk</option><option>Paladin</option><option>Ranger</option><option>Rogue</option><option>Sorcerer</option><option>Warlock</option><option>Wizard</option>
+      </select>
+      <button class="button" id="genBack" style="margin-top:.6rem">Forge Backstory</button>
+      <div id="backOut" aria-live="polite" style="margin-top:.8rem"></div>
+    </div>
+    <div class="card">
+      <h3>What it makes</h3>
+      <p>Hooks with a symbolic memento and a thread to pull in play.</p>
+    </div>
+  </section>
+
+  <hr class="sep">
+
+  <section id="map" class="grid grid-2">
+    <div class="card">
+      <h3>Pocket Map</h3>
+      <details open>
+        <summary>🕯️ The Lantern Market</summary>
+        A tangle of alleys where glassblowers sell bottled starlight.
+      </details>
+      <details>
+        <summary>🍃 Wyrmwood Edge</summary>
+        Owls whisper warnings. Travelers leave offerings of copper.
+      </details>
+      <details>
+        <summary>⛰️ The Ash Tunnels</summary>
+        Lava-scarred caverns where the Obsidian Keystone once lay.
+      </details>
+      <details>
+        <summary>🏛️ Oniron Archives</summary>
+        Stacks of vellum. Librarians measure time by candle height.
+      </details>
+    </div>
+    <div class="card">
+      <h3>About this site</h3>
+      <p>Single-file site—perfect for GitHub Pages. No dependencies, no APIs.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container grid grid-2">
+    <div><small class="muted">© <span id="year"></span> Your Name. HTML + CSS + vanilla JS.</small></div>
+    <div style="justify-self:end"><a class="button" href="#top">Back to top</a></div>
+  </div>
+</footer>
+
+<script>
   // ===== Theme =====
   (function(){
     var root = document.documentElement;
-    var toggle = document.getElementById('themeToggle');
+    var t = document.getElementById('themeToggle');
     var saved = localStorage.getItem('theme');
-    if (saved === 'light') { root.classList.add('light'); if (toggle){ toggle.checked = true; toggle.setAttribute('aria-checked','true'); } }
-    if (toggle) toggle.addEventListener('change', function(){
-      var isLight = !!toggle.checked;
+    if (saved === 'light'){ root.classList.add('light'); if (t){ t.checked = true; } }
+    if (t) t.addEventListener('change', function(){
+      var isLight = !!t.checked;
       if (isLight) root.classList.add('light'); else root.classList.remove('light');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      toggle.setAttribute('aria-checked', String(isLight));
     });
+  })();
+
+  // ===== Data (local) =====
+  (function(){
+    window.NAMES = {
+      elf:["Elaith","Larethian","Faelar","Aeris","Sylvara","Thalanil","Nymeria","Aelar","Syllin","Vaelis"],
+      dwarf:["Brom","Torunn","Hilda","Durik","Kazgrim","Brunhild","Rurik","Gimra","Thrain","Mavda"],
+      human:["Alaric","Seraphine","Garrick","Rowan","Mira","Corvin","Elara","Tristan","Sabine","Dorian"],
+      lizardfolk:["Sszark","Vresh","Thri'kash","Isskra","Zerith","Ressik","Sarraka","Kravax","Thozra","Vek"],
+      orc:["Grom","Urga","Sharn","Vrusk","Magra","Thok","Zugra","Brakka","Orzul","Grishnak"]
+    };
+    window.LOCS = ["the Lantern Market","Wyrmwood Edge","the Ash Tunnels","the Oniron Archives","the Moonfen","Stormglass Cliffs","the Ember Docks"];
+    window.MONSTERS = ["ember wraith","glass basilisk","moonfen lurker","ash-tunnel troll","wyrmwood stalker","stormglass harpy","lantern revenant"];
+    window.VERBS = ["Hunt","Investigate","Protect","Recover","Escort","Disrupt","Track"];
+    window.MEMENTOS = ["a soot-stained locket","a shard of black glass","a riverwarden badge","a lantern with cracked glass","a brass coin with a bite mark"];
+    window.THREADS = ["a promise you failed to keep","a debt owed to the Ember Guild","a map fragment you can’t translate","dreams of ash and bells","a friend who never returned"];
+    window.pick = function(a){ return a[Math.floor(Math.random()*a.length)]; };
   })();
 
   // ===== Quest filter =====
@@ -270,179 +257,73 @@
     var lastTotal = null;
     if (!output || !countInput) return;
     function rollDie(s){ return Math.floor(Math.random()*s)+1; }
-    function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
-    function roll(sides){
-      var n = parseInt(countInput.value || '1', 10);
-      n = clamp(isNaN(n)?1:n, 1, 20);
-      var rolls = [];
-      for (var i=0;i<n;i++) rolls.push(rollDie(sides));
-      var total = 0; for (var j=0;j<rolls.length;j++) total+=rolls[j];
-      output.innerHTML = '<strong>'+n+'×d'+sides+'</strong>: '+rolls.join(', ')+' — <strong>total '+total+'</strong>' + (lastTotal!==null ? ' (prev '+lastTotal+')' : '');
+    function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+    function roll(s){
+      var n = parseInt(countInput.value || '1',10); if (isNaN(n)) n = 1; n = clamp(n,1,20);
+      var rolls = [], total = 0;
+      for (var i=0;i<n;i++){ var r = rollDie(s); rolls.push(r); total += r; }
+      output.innerHTML = "<strong>"+n+"×d"+s+"</strong>: "+rolls.join(", ")+" — <strong>total "+total+"</strong>"+(lastTotal!==null?" (prev "+lastTotal+")":"");
       lastTotal = total;
     }
-    var dieBtns = document.querySelectorAll('.die');
-    for (var i=0;i<dieBtns.length;i++){
-      (function(btn){
-        btn.addEventListener('click', function(){
-          var s = parseInt(btn.getAttribute('data-sides'), 10);
-          roll(s);
-        });
-      })(dieBtns[i]);
+    var btns = document.querySelectorAll('.die');
+    for (var i=0;i<btns.length;i++){
+      (function(b){ b.addEventListener('click', function(){ roll(parseInt(b.getAttribute('data-sides'),10)); }); })(btns[i]);
     }
     document.addEventListener('keydown', function(e){
-      var map = { '1':4,'2':6,'3':8,'4':10,'5':12,'6':20,'7':100 };
+      var map = {'1':4,'2':6,'3':8,'4':10,'5':12,'6':20,'7':100};
       if (map[e.key]) roll(map[e.key]);
     });
-    if (sidesInput) sidesInput.addEventListener('change', function(){
-      var s = parseInt(sidesInput.value,10); if (s>=2) roll(s);
-    });
-  })();
-
-  // ===== Local data & helpers =====
-  (function(){
-    window.NAMES = {
-      elf: ["Elaith","Larethian","Faelar","Aeris","Sylvara","Thalanil","Nymeria","Aelar","Syllin","Vaelis"],
-      dwarf: ["Brom","Torunn","Hilda","Durik","Kazgrim","Brunhild","Rurik","Gimra","Thrain","Mavda"],
-      human: ["Alaric","Seraphine","Garrick","Rowan","Mira","Corvin","Elara","Tristan","Sabine","Dorian"],
-      lizardfolk: ["Sszark","Vresh","Thri'kash","Isskra","Zerith","Ressik","Sarraka","Kravax","Thozra","Vek"],
-      orc: ["Grom","Urga","Sharn","Vrusk","Magra","Thok","Zugra","Brakka","Orzul","Grishnak"]
-    };
-    window.LOCS = ['the Lantern Market','Wyrmwood Edge','the Ash Tunnels','the Oniron Archives','the Moonfen','Stormglass Cliffs','the Ember Docks'];
-    window.pick = function(arr){ return arr[Math.floor(Math.random()*arr.length)]; };
+    if (sidesInput) sidesInput.addEventListener('change', function(){ var s=parseInt(sidesInput.value,10); if (s>=2) roll(s); });
   })();
 
   // ===== Name forge (local) =====
   (function(){
-    var raceSelect = document.getElementById('raceSelect');
-    var gen = document.getElementById('genName');
-    var nameOut = document.getElementById('nameOut');
-    if (gen && raceSelect && nameOut){
-      gen.addEventListener('click', function(){
-        var set = (window.NAMES && window.NAMES[raceSelect.value]) || (window.NAMES && window.NAMES.human) || ['Traveler'];
-        nameOut.textContent = window.pick(set);
-      });
-    }
-  })();
-
-  // ===== Name forge (public API) =====
-  (function(){
-    var genApi = document.getElementById('genNameApi');
-    var raceSelect = document.getElementById('raceSelect');
-    var nameOut = document.getElementById('nameOut');
-    if (!genApi || !raceSelect || !nameOut) return;
-    function fallback(){
-      var set = (window.NAMES && window.NAMES[raceSelect.value]) || (window.NAMES && window.NAMES.human) || ['Traveler'];
-      nameOut.textContent = window.pick(set);
-    }
-    genApi.addEventListener('click', function(){
-      var map = { human:'h', dwarf:'d', elf:'e', orc:'o', lizardfolk:'h' };
-      var a = map[raceSelect.value] || 'h';
-      var url = 'https://fantasyname.lukewh.com/?family=t&ancestry=' + a;
-      fetch(url, {mode:'cors'}).then(function(res){ return res.text(); }).then(function(txt){
-        var cleaned = (txt||'').replace(/
-?
-/g,' ').trim();
-        if (cleaned) nameOut.textContent = cleaned; else fallback();
-      }).catch(fallback);
+    var race = document.getElementById('raceSelect');
+    var btn = document.getElementById('genName');
+    var out = document.getElementById('nameOut');
+    if (!btn || !race || !out) return;
+    btn.addEventListener('click', function(){
+      var set = (window.NAMES && window.NAMES[race.value]) || window.NAMES.human;
+      out.textContent = window.pick(set);
     });
   })();
 
-  // ===== Quest generator (Open5e public API) =====
+  // ===== Local quest generator =====
   (function(){
     var btn = document.getElementById('genQuest');
     var btn3 = document.getElementById('genQuest3');
     var list = document.getElementById('questList');
     if (!btn || !list) return;
-    var LOCS = window.LOCS || [];
-    function getCount(url, key, fallback){
-      try{
-        var cached = Number(sessionStorage.getItem(key)) || 0;
-        if (cached) return Promise.resolve(cached);
-      } catch(e){ /* ignore */ }
-      return fetch(url).then(function(r){return r.json();}).then(function(j){
-        var c = j && j.count ? j.count : fallback;
-        try{ sessionStorage.setItem(key, String(c)); }catch(e){}
-        return c;
-      }).catch(function(){ return fallback; });
-    }
-    function randomMonster(){
-      return getCount('https://api.open5e.com/v1/monsters/?limit=1','o5e_mon_count',1000).then(function(count){
-        var offset = Math.floor(Math.random()*count);
-        return fetch('https://api.open5e.com/v1/monsters/?limit=1&offset='+offset).then(function(r){return r.json();}).then(function(d){
-          return d && d.results && d.results[0];
-        });
-      }).catch(function(){ return null; });
-    }
-    function questLine(mon){
-      var place = LOCS.length ? window.pick(LOCS) : 'the road beyond the gates';
-      var cr = (mon && (mon.cr || mon.challenge_rating)) || '?';
-      var name = (mon && mon.name) || 'unknown foe';
-      var verbs = ['Hunt','Investigate','Protect','Recover','Escort','Disrupt','Track'];
-      return window.pick(verbs) + ' a <strong>' + name + '</strong> near <strong>' + place + '</strong> (CR ' + cr + ').';
+    function localQuest(){
+      var verb = window.pick(window.VERBS);
+      var mon = window.pick(window.MONSTERS);
+      var place = window.pick(window.LOCS);
+      return verb + " a <strong>" + mon + "</strong> near <strong>" + place + "</strong>.";
     }
     function addQuest(){
-      randomMonster().then(function(m){
-        var li = document.createElement('li');
-        li.className = 'quest-card';
-        li.innerHTML = questLine(m);
-        list.prepend(li);
-      });
+      var li = document.createElement('li');
+      li.className = 'quest-card';
+      li.innerHTML = localQuest();
+      list.prepend(li);
     }
     btn.addEventListener('click', addQuest);
     if (btn3) btn3.addEventListener('click', function(){ addQuest(); addQuest(); addQuest(); });
   })();
 
-  // ===== Backstory Forge (Open5e backgrounds) =====
+  // ===== Local backstory generator =====
   (function(){
     var btn = document.getElementById('genBack');
     var out = document.getElementById('backOut');
     var race = document.getElementById('backRace');
     var klass = document.getElementById('backClass');
     if (!btn || !out) return;
-    function getCount(url, key, fallback){
-      try{
-        var cached = Number(sessionStorage.getItem(key)) || 0;
-        if (cached) return Promise.resolve(cached);
-      } catch(e){ }
-      return fetch(url).then(function(r){return r.json();}).then(function(j){
-        var c = j && j.count ? j.count : fallback;
-        try{ sessionStorage.setItem(key, String(c)); }catch(e){}
-        return c;
-      }).catch(function(){ return fallback; });
-    }
-    function randomBackground(){
-      return getCount('https://api.open5e.com/v2/backgrounds/?limit=1','o5e_bg_count',50).then(function(count){
-        var offset = Math.floor(Math.random()*count);
-        return fetch('https://api.open5e.com/v2/backgrounds/?limit=1&offset='+offset).then(function(r){return r.json();}).then(function(d){
-          return d && d.results && d.results[0];
-        });
-      }).catch(function(){ return null; });
-    }
-    function firstSentence(s){
-      if (!s) return '';
-      var flat = s.replace(/
-?
-/g,' ');
-      var idx = flat.indexOf('.');
-      return idx>0 ? flat.slice(0, idx+1) : flat;
-    }
     btn.addEventListener('click', function(){
-      out.textContent = 'Forging…';
-      randomBackground().then(function(bg){
-        if (!bg){ out.textContent = 'Could not reach Open5e right now—try again later.'; return; }
-        var benefits = bg.benefits || [];
-        var conn = '';
-        var mem = '';
-        for (var i=0;i<benefits.length;i++){
-          var b = benefits[i];
-          if (!b || !b.type) continue;
-          var t = String(b.type).toLowerCase();
-          if (!conn && t.indexOf('connection')!==-1) conn = b.desc || '';
-          if (!mem && t.indexOf('memento')!==-1) mem = b.desc || '';
-        }
-        var idea = 'You are a ' + (race?race.value.toLowerCase():'') + ' ' + (klass?klass.value.toLowerCase():'') + ' with the <strong>' + bg.name + '</strong> background. ' + firstSentence(conn) + ' ' + firstSentence(mem);
-        out.innerHTML = idea.trim();
-      }).catch(function(){ out.textContent = 'Could not reach Open5e right now—try again later.'; });
+      var m = window.pick(window.MEMENTOS);
+      var t = window.pick(window.THREADS);
+      var para = "You are a " + race.value.toLowerCase() + " " + klass.value.toLowerCase() +
+        " who learned to read the wind along alley-rows and ash tunnels. You carry " + m +
+        " and follow " + t + ". The Lantern Market remembers your name—whether in whispers or in songs depends on what you do next.";
+      out.textContent = para;
     });
   })();
 
@@ -455,19 +336,10 @@
         a.addEventListener('click', function(e){
           var id = a.getAttribute('href').slice(1);
           var target = document.getElementById(id);
-          if (target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); target.classList.add('flash'); setTimeout(function(){target.classList.remove('flash');}, 600); }
+          if (target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); target.classList.add('flash'); setTimeout(function(){target.classList.remove('flash');},600); }
         });
       })(anchors[i]);
     }
-    var code = '';
-    window.addEventListener('keydown', function(e){
-      var k = (e.key||'').toLowerCase();
-      if ('wasdjkl'.indexOf(k) === -1) code = ''; else code += k;
-      if (code.slice(-4) === 'wasd'){
-        if (document.body && document.body.animate){ document.body.animate([{filter:'brightness(1)'},{filter:'brightness(1.3)'}], {duration:300}); }
-        code='';
-      }
-    });
   })();
 </script>
 </body>
